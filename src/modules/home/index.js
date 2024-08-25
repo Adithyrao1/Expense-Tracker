@@ -1,40 +1,51 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import OverviewComponent from './OverviewComponent';
-import TransactionsComponent from './Transactions';
-const Container = styled.div `
-display: flex;
-flex-direction: column;
-font-family: 'Raleway', sans-serif;
-font-size: 1rem;
-align-items: center;
-margin: 3rem 0 2rem;
-`;
-const HomeComponent = (props) => {
-    const [transactions,updateTransaction] = useState([]);
-    const [expense,updateExpense] = useState(0);
-    const [income,updateIncome] = useState(0);
+import Transactions from './Transactions';
 
-    const addTransaction = (payload) => {
-        const transactionArray = [...transactions];
-        transactionArray.push(payload);
-        updateTransaction(transactionArray);
-    }
-    const calculateBalance = () => {
-        let exp=0;
-        let inc=0;
-        transactions.map((payload) => {
-            (payload.type==="EXPENSE") ? (exp = exp+payload.amount) : (inc = inc+payload.amount);
-            updateExpense(exp);
-            updateIncome(inc);
-        })
-    }
-    useEffect(() => calculateBalance(),[transactions])
-    return (
-        <Container>
-         <OverviewComponent addTransaction = {addTransaction} expense={expense} income={income} />
-         <TransactionsComponent filteredTransaction={transactions}/>
-        </Container>
-    )
-}
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1rem;
+  align-items: center;
+  margin: 3rem 0 2rem;
+  width: 100%;
+`;
+
+const HomeComponent = () => {
+  const [transactions, setTransactions] = useState([]);
+  const [expense, setExpense] = useState(0);
+  const [income, setIncome] = useState(0);
+
+  const addTransaction = (payload) => {
+    setTransactions([...transactions, payload]);
+  };
+
+  const calculateBalance = () => {
+    let exp = 0;
+    let inc = 0;
+    transactions.forEach(({ type, amount }) => {
+      if (type === "EXPENSE") {
+        exp += amount;
+      } else {
+        inc += amount;
+      }
+    });
+    setExpense(exp);
+    setIncome(inc);
+  };
+
+  useEffect(() => {
+    calculateBalance();
+  }, [transactions]);
+
+  return (
+    <Container>
+      <OverviewComponent addTransaction={addTransaction} expense={expense} income={income} />
+      <Transactions transactions={transactions} />
+    </Container>
+  );
+};
+
 export default HomeComponent;
